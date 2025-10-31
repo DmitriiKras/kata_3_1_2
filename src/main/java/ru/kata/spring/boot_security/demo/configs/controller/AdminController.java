@@ -8,10 +8,13 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import ru.kata.spring.boot_security.demo.configs.Service.UserService;
+import ru.kata.spring.boot_security.demo.configs.model.Role;
 import ru.kata.spring.boot_security.demo.configs.model.User;
 
 import java.security.Principal;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Controller
 @RequestMapping("/admin")
@@ -40,19 +43,27 @@ public class AdminController {
     }
     @GetMapping("/addNewUser")
     public String addNewUser(Model model) {
-
-        User user=new User();
-        model.addAttribute("user",user);
+        User user = new User();
+        model.addAttribute("user", user);
+        model.addAttribute("allRoles", userService.getAllRoles());
         return "user-info";
     }
 
 
     @PostMapping("/saveUser")
-    public String saveUser(@ModelAttribute("user") User user) {
-        // Кодируем пароль перед сохранением
+    public String saveUser(@ModelAttribute("user") User user,
+                           @RequestParam(value="roleIds", required=false) List<Long> roleIds) {
         if (user.getPassword() != null && !user.getPassword().isEmpty()) {
             user.setPassword(passwordEncoder.encode(user.getPassword()));
         }
+
+        if (roleIds != null) {
+            Set<Role> roles = roleIds.stream()
+                    .map(id -> userService.getRoleById(id))
+                    .collect(Collectors.toSet());
+            user.setRole(roles);
+        }
+
         userService.saveUser(user);
         return "redirect:/admin";
     }

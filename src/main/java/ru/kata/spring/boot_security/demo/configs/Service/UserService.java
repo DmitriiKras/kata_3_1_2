@@ -13,4 +13,6 @@ public interface UserService {
     public User getUser(long id);
     public void deleteUser(long id);
     public UserDetails loadUserByUsername(String username);
+    public List<Role> getAllRoles();
+    Role getRoleById(Long id);
 }

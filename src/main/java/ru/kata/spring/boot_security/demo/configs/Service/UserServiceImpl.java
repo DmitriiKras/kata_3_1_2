@@ -19,10 +19,12 @@ import java.util.Optional;
 public class UserServiceImpl implements UserService, UserDetailsService {
 
     private final UserDao userDao;
+    private final RoleDao roleDao;
 
     @Autowired
-    public UserServiceImpl(UserDao userDao, RoleDao roleDao) {
+    public UserServiceImpl(UserDao userDao, RoleDao roleDao, RoleDao roleDao1) {
         this.userDao = userDao;
+        this.roleDao = roleDao1;
     }
 
     @Override
@@ -57,5 +59,14 @@ public class UserServiceImpl implements UserService, UserDetailsService {
            throw new UsernameNotFoundException("User not found");
        }
        return user.get();
+    }
+    @Override
+    public List<Role> getAllRoles() {
+        return roleDao.getAllRoles();
+    }
+
+    @Override
+    public Role getRoleById(Long id) {
+        return roleDao.getRoleById(id);
     }
 }
